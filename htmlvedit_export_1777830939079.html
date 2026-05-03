@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>AternOS | Pro</title>
+    <style>
+        :root { --ios-blue: #007aff; --wa-green: #25D366; }
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+        body, html { height: 100%; width: 100%; overflow: hidden; font-family: -apple-system, sans-serif; background: #000; }
+
+        /* --- ANDROID STARTUP --- */
+        #boot-screen {
+            position: fixed; inset: 0; background: #000; z-index: 9999;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            transition: opacity 1s ease-out;
+        }
+        .boot-logo { color: white; font-size: 2.5rem; font-weight: 300; letter-spacing: 2px; }
+        .boot-footer { position: absolute; bottom: 50px; color: #555; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; }
+
+        /* --- LOCK SCREEN --- */
+        #lock-screen { 
+            position: fixed; inset: 0; 
+            background: url('https://images.unsplash.com/photo-1510133769068-ad0571054970') center/cover; 
+            z-index: 5000; display: none; flex-direction: column; align-items: center; 
+            justify-content: space-between; padding: 100px 0 80px; color: white; 
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        #lock-screen.unlocked { transform: translateY(-100%); }
+
+        /* --- HOME SCREEN --- */
+        #os-view { height: 100%; width: 100%; background: linear-gradient(145deg, #1e3c72, #2a5298); display: flex; flex-direction: column; }
+        .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 25px; padding: 60px 25px; }
+        .app { display: flex; flex-direction: column; align-items: center; cursor: pointer; }
+        .app-icon { width: 62px; height: 62px; border-radius: 15px; background: white; display: flex; justify-content: center; align-items: center; font-size: 30px; box-shadow: 0 4px 12px rgba(0,0,0,0.4); }
+        .app-name { color: white; font-size: 11px; margin-top: 6px; font-weight: 500; text-shadow: 0 1px 2px rgba(0,0,0,0.8); }
+
+        /* --- WINDOW SYSTEM --- */
+        .win { position: fixed; inset: 0; background: white; z-index: 1000; display: none; flex-direction: column; animation: slideUp 0.3s ease-out; }
+        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+        .win-head { padding: 15px; border-bottom: 1px solid #ddd; display: flex; justify-content: space-between; align-items: center; background: #fafafa; font-weight: bold; }
+        .close-btn { color: var(--ios-blue); border: none; background: none; font-size: 16px; cursor: pointer; }
+
+        /* --- PHONE & CALL --- */
+        #phone-win { background: #000; color: white; }
+        .dial-display { height: 120px; display: flex; justify-content: center; align-items: center; font-size: 3rem; }
+        .keypad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; padding: 0 45px; }
+        .key { width: 75px; height: 75px; background: #333; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 28px; cursor: pointer; }
+        #call-ui { position: fixed; inset: 0; background: #1c1c1e; z-index: 6000; display: none; flex-direction: column; align-items: center; padding-top: 80px; color: white; }
+        .end-call { width: 75px; height: 75px; background: #ff3b30; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 30px; margin-top: 60px; transform: rotate(135deg); cursor: pointer; }
+
+        /* --- WHATSAPP --- */
+        #chat-view { z-index: 1100; background: #e5ddd5; }
+        .bubble { max-width: 75%; padding: 10px; border-radius: 12px; margin: 5px; font-size: 15px; }
+        .sent { align-self: flex-end; background: #dcf8c6; }
+        .rec { align-self: flex-start; background: #fff; }
+
+        /* --- MUSIC --- */
+        #music-win { background: #121212; color: white; }
+        .album-art { width: 80%; aspect-ratio: 1; margin: 40px auto 20px; background: url('https://i1.sndcdn.com/artworks-000671607526-y6e2o7-t500x500.jpg') center/cover; border-radius: 12px; }
+    </style>
+</head>
+<body>
+
+    <!-- ANDROID STARTUP -->
+    <div id="boot-screen">
+        <div class="boot-logo">Aternos OS</div>
+        <div class="boot-footer">Powered by AternOS</div>
+    </div>
+
+    <!-- LOCK SCREEN -->
+    <div id="lock-screen" onclick="unlock()">
+        <h1 id="lock-time" style="font-size: 80px; font-weight: 200;">19:24</h1>
+        <p>Sunday, May 3</p>
+        <p style="margin-bottom: 20px; font-size: 14px; opacity: 0.8;">Swipe up to open</p>
+    </div>
+
+    <div id="os-view">
+        <div class="grid">
+            <div class="app" onclick="openW('phone-win')"><div class="app-icon" style="background:#34c759; color:white;">📞</div><div class="app-name">Phone</div></div>
+            <div class="app" onclick="openW('wa-win')"><div class="app-icon" style="background:#25D366; color:white;">💬</div><div class="app-name">WhatsApp</div></div>
+            <div class="app" onclick="openW('music-win')"><div class="app-icon" style="background:#ff2d55; color:white;">🎵</div><div class="app-name">Music</div></div>
+            <div class="app" onclick="location.reload()"><div class="app-icon" style="background:#8e8e93; color:white;">⚙️</div><div class="app-name">Reset</div></div>
+        </div>
+    </div>
+
+    <!-- PHONE APP -->
+    <div id="phone-win" class="win">
+        <div class="win-head" style="background:#000; color:white; border:none;"><span>Keypad</span><span class="close-btn" onclick="closeW('phone-win')">Cancel</span></div>
+        <div class="dial-display" id="dial-num"></div>
+        <div class="keypad" id="pad-grid"></div>
+        <div style="display:flex; justify-content:center; gap:40px; margin-top:30px; align-items:center;">
+            <div style="width:75px"></div>
+            <div class="key" style="background:#34c759; color:white;" onclick="triggerCall()">📞</div>
+            <div class="key" style="background:transparent; font-size:20px;" onclick="dialDel()">⌫</div>
+        </div>
+    </div>
+
+    <!-- CALL UI (image_7.png) -->
+    <div id="call-ui">
+        <p style="color:#aaa;">calling mobile...</p>
+        <h1 id="calling-name" style="margin:10px 0 60px;">Unknown</h1>
+        <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:35px; text-align:center; font-size:12px;">
+            <div><div class="key" style="background:rgba(255,255,255,0.1)">🔊</div>speaker</div>
+            <div><div class="key" style="background:rgba(255,255,255,0.1)">🎥</div>FaceTime</div>
+            <div><div class="key" style="background:rgba(255,255,255,0.1)">🎙️</div>mute</div>
+        </div>
+        <div class="end-call" onclick="endCall()">📞</div>
+        <audio id="call-audio" src="Funny Prank call Domino’s Pizza with Verizon Wireless.mp3"></audio>
+    </div>
+
+    <!-- WHATSAPP -->
+    <div id="wa-win" class="win">
+        <div class="win-head"><span>WhatsApp</span><span class="close-btn" style="color:var(--wa-green)">Edit</span></div>
+        <div style="padding:15px; border-bottom:1px solid #eee;" onclick="openChat('Toast420')"><b>Toast420</b><br><small>Online</small></div>
+    </div>
+
+    <div id="chat-view" class="win">
+        <div class="win-head"><span class="close-btn" onclick="closeW('chat-view')">❮ Back</span><span id="chat-title">User</span><span></span></div>
+        <div id="msg-log" style="flex:1; display:flex; flex-direction:column; padding:15px; overflow-y:auto;"></div>
+    </div>
+
+    <!-- MUSIC (image_8.png) -->
+    <div id="music-win" class="win">
+        <div class="win-head" style="background:transparent; color:white; border:none;"><span>Music</span><span class="close-btn" style="color:white" onclick="closeW('music-win')">✕</span></div>
+        <div class="album-art"></div>
+        <div style="text-align:center;">
+            <h3>Looping the Rooms</h3>
+            <p style="color:#888;">Rusino feat. HATSUNE MIKU</p>
+        </div>
+    </div>
+
+    <script>
+        // Startup Logic
+        window.onload = () => {
+            setTimeout(() => {
+                document.getElementById('boot-screen').style.opacity = '0';
+                setTimeout(() => {
+                    document.getElementById('boot-screen').style.display = 'none';
+                    document.getElementById('lock-screen').style.display = 'flex';
+                }, 1000);
+            }, 3000); // 3-second boot
+        };
+
+        function unlock() { document.getElementById('lock-screen').classList.add('unlocked'); }
+        function openW(id) { document.getElementById(id).style.display = 'flex'; }
+        function closeW(id) { document.getElementById(id).style.display = 'none'; }
+
+        // Phone Setup
+        let dNum = "";
+        const keys = "123456789*0#";
+        keys.split('').forEach(k => {
+            const b = document.createElement('div'); b.className = 'key'; b.innerText = k;
+            b.onclick = () => { dNum += k; document.getElementById('dial-num').innerText = dNum; };
+            document.getElementById('pad-grid').appendChild(b);
+        });
+        function dialDel() { dNum = dNum.slice(0, -1); document.getElementById('dial-num').innerText = dNum; }
+        
+        function triggerCall() {
+            document.getElementById('calling-name').innerText = dNum || "Test 99";
+            openW('call-ui');
+            document.getElementById('call-audio').play();
+        }
+        function endCall() {
+            closeW('call-ui');
+            document.getElementById('call-audio').pause();
+            document.getElementById('call-audio').currentTime = 0;
+        }
+
+        function openChat(name) {
+            document.getElementById('chat-title').innerText = name;
+            document.getElementById('msg-log').innerHTML = `<div class="bubble rec">Hey ${name}, looking forward to the next collab!</div>`;
+            openW('chat-view');
+        }
+
+        setInterval(() => {
+            const now = new Date();
+            document.getElementById('lock-time').innerText = now.getHours().toString().padStart(2, '0') + ":" + now.getMinutes().toString().padStart(2, '0');
+        }, 1000);
+    </script>
+</body>
+</html>
